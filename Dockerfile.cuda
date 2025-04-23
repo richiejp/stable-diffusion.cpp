@@ -1,0 +1,16 @@
+ARG UBUNTU_VERSION=22.04
+ARG NPROC=1
+
+FROM nvidia/cuda:12.0.0-devel-ubuntu$UBUNTU_VERSION as build
+
+RUN apt-get update && apt-get install -y build-essential git cmake
+
+WORKDIR /sd.cpp
+
+COPY . .
+
+RUN mkdir build && cd build && cmake .. -DSD_CUDA=ON && cmake --build . --config Release -j${NPROC}
+
+WORKDIR /sd.cpp/build/bin
+
+ENTRYPOINT [ "./sd" ]
